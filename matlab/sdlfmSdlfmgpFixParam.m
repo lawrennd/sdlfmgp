@@ -18,29 +18,4 @@ for k=1:length(index);
     model.fix(count).index = index(k);
     model.fix(count).value = expTransform(0.1, 'xtoa');
 end
-
-%/~
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%% Just use temporarily to check something
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-index = paramNameRegularExpressionLookup(model, '.* switching point interval 1');
-
-for k=1:length(index);
-    count = count + 1;
-    model.fix(count).index = index(k);
-    model.fix(count).value = model.kern.comp{1}.comp{1}.switchingTimes(1);
-end
-
-valkInit = model.kern.comp{1}.LIC(:)';
-index = paramNameRegularExpressionLookup(model, '.* kInit.*');
-
-for k=1:length(index);
-    count = count + 1;
-    model.fix(count).index = index(k);
-    model.fix(count).value = valkInit(k);
-end
-%~/
  

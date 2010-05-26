@@ -58,21 +58,21 @@ switch model.approx
         model.sdrbfKern = kernExpandParam(model.sdrbfKern, params1);
         mu = cell(model.d+model.nlfPerInt,1);
         varsig = cell(model.d+model.nlfPerInt,1);
-        Kfu = zeros(model.N, model.nlfPerInt*length(xtemp));
+        Kfu = zeros(model.N, model.nlfPerInt*length(X{1}));
         startVal = 1;
         endVal = 0;
         for i=1:model.nout
             endVal = endVal + length(model.X{i});
-            KTemp = sdlfmXsdrbfKernCompute(model.kern.comp{1}.comp{i}, model.sdrbfKern, model.X{i}, xtemp);
+            KTemp = sdlfmXsdrbfKernCompute(model.kern.comp{1}.comp{i}, model.sdrbfKern, model.X{i}, X{i});
             Kfu(startVal:endVal, :) = cell2mat(KTemp);
             startVal = endVal + 1;
         end
-        KuuTemp = sdrbfKernCompute(model.sdrbfKern, xtemp);
-        KuuM = zeros(model.nlfPerInt*length(xtemp));
+        KuuTemp = sdrbfKernCompute(model.sdrbfKern, X{1});
+        KuuM = zeros(model.nlfPerInt*length(X{1}));
         startVal = 1;
         endVal = 0;
         for i=1:model.nlfPerInt
-            endVal = endVal + length(xtemp);
+            endVal = endVal + length(X{i});
             KuuM(startVal:endVal, startVal:endVal) = KuuTemp{i};
             startVal = endVal + 1;
         end
@@ -83,7 +83,7 @@ switch model.approx
         endVal = 0;        
         for i=1:model.nlfPerInt
             cont = cont + 1;
-            endVal = endVal + length(xtemp);
+            endVal = endVal + length(X{i});
             mu{cont} = muTemp1(startVal:endVal);
             varsig{cont} = diag(KuuPost);            
         end        

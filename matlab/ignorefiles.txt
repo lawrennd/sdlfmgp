@@ -2,6 +2,8 @@ addToolboxes.m
 demToySdlfm11.m  
 demToySdlfm1.m
 demToySdlfm2.m
+testLFMfiles2.m
+testLFMGradFiles.m
 testSDLFMfiles3.m
 testSDLFMfiles5.m
 testSDLFMfiles6.m
