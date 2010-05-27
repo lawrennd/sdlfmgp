@@ -16,6 +16,7 @@ function sdlfmgpToyResults(dataSetName, experimentNo, XTemp, yTemp, XGT, fGT)
 capName = dataSetName;
 capName(1) = upper(capName(1));
 load(['dem' capName num2str(experimentNo) '.mat'], 'model');
+
 saveFigures = false;
 scaleVal = 1;
 

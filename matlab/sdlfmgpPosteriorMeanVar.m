@@ -47,15 +47,18 @@ switch model.approx
     case 'ftc'
         % We need first to create the SDRBF kernel and pass the parameters
         % to it.
-        indxIW = paramNameRegularExpressionLookup(model, '.* inverse width .*');
-        indxSP = paramNameRegularExpressionLookup(model, '.* switching point .*');
-        indxIW1 = paramNameRegularExpressionLookup(model.sdrbfKern, 'inverse width .*',1); 
-        indxSP1 = paramNameRegularExpressionLookup(model.sdrbfKern, 'switching point .*',1); 
-        params = kernExtractParam(model.kern);
-        params1 = kernExtractParam(model.sdrbfKern); 
-        params1(indxIW1) = params(indxIW);
-        params1(indxSP1) = params(indxSP);
-        model.sdrbfKern = kernExpandParam(model.sdrbfKern, params1);
+        model.sdrbfKern.inverseWidth = model.kern.comp{1}.comp{1}.inverseWidth;
+        model.sdrbfKern.switchingTimes = model.kern.comp{1}.comp{1}.switchingTimes;
+% 
+%         indxIW = paramNameRegularExpressionLookup(model, '.* inverse width .*');
+%         indxSP = paramNameRegularExpressionLookup(model, '.* switching point .*');
+%         indxIW1 = paramNameRegularExpressionLookup(model.sdrbfKern, 'inverse width .*',1); 
+%         indxSP1 = paramNameRegularExpressionLookup(model.sdrbfKern, 'switching point .*',1); 
+%         params = kernExtractParam(model.kern);
+%         params1 = kernExtractParam(model.sdrbfKern); 
+%         params1(indxIW1) = params(indxIW);
+%         params1(indxSP1) = params(indxSP);
+%         model.sdrbfKern = kernExpandParam(model.sdrbfKern, params1);
         mu = cell(model.d+model.nlfPerInt,1);
         varsig = cell(model.d+model.nlfPerInt,1);
         Kfu = zeros(model.N, model.nlfPerInt*length(X{1}));

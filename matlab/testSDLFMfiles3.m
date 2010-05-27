@@ -32,9 +32,9 @@ sensitivity = 3+ 5*rand(1,length(sensitivityIndx));
 params(sensitivityIndx) = sensitivity; 
 sdlfmKern1 = kernExpandParam(sdlfmKern1, params);
 sdlfmKern1.inverseWidth = reshape(inverseWidth, options.nlfPerInt, options.nIntervals);
-sdlfmKern1.mass = 2*rand;
-sdlfmKern1.spring = 2*rand;
-sdlfmKern1.damper = 2*rand;
+sdlfmKern1.mass = 0.1;
+sdlfmKern1.spring = 0.5;
+sdlfmKern1.damper = 1;
 
 params = sdlfmKernExtractParam(sdlfmKern1);
 sdlfmKern1 = sdlfmKernExpandParam(sdlfmKern1, params);
@@ -43,18 +43,22 @@ sdlfmKern1 = sdlfmKernExpandParam(sdlfmKern1, params);
 sdlfmKern2 = kernCreate(t1, {'parametric', options ,'sdlfm'});
 sdlfmKern2.inverseWidth = sdlfmKern1.inverseWidth;
 sdlfmKern2.sensitivity = 2*rand(size(sdlfmKern2.sensitivity));
-sdlfmKern2.mass = 2*rand;
-sdlfmKern2.spring = 2*rand;
-sdlfmKern2.damper = 2*rand;
+sdlfmKern2.mass = 0.1;
+sdlfmKern2.spring = 0.2;
+sdlfmKern2.damper = 1;
 
 params = sdlfmKernExtractParam(sdlfmKern2);
 sdlfmKern2 = sdlfmKernExpandParam(sdlfmKern2, params);
 
+t1 = t2;
+sdlfmKern1 = sdlfmKern2;
+
+
 covGrad = ones(length(t1), length(t2));
 
 
-fhandle1 = str2func('sdlfmaXsdlfmaKernCompute');
-fhandle2 = str2func('sdlfmaXsdlfmaKernGradient');
+fhandle1 = str2func('sdlfmvXsdlfmvKernCompute');
+fhandle2 = str2func('sdlfmvXsdlfmvKernGradient');
 
 K = fhandle1(sdlfmKern1, sdlfmKern2, t1, t2, covIC);
 
@@ -71,6 +75,27 @@ sdlfmKern1.mass = mass - epsilon;
 K2 = fhandle1(sdlfmKern1, sdlfmKern2, t1, t2, covIC);
 mass1n = 0.5*sum(sum((K1 - K2)))/epsilon;
 sdlfmKern1.mass = mass;
+%%%%%%%%%%% Helps to see where is a mistake
+dim1 = zeros(1, options.nIntervals);
+spVector = [cumsum(sdlfmKern1.switchingTimes) t1(end)+50];
+for i =1:options.nIntervals
+    newt1 = t1(t1> spVector(i) & t1<spVector(i+1));
+    dim1(i) = length(newt1);
+end
+gradNum = zeros(length(dim1));
+start1 = 1;
+end1 =0;
+for i=1:length(dim1)
+    end1 = end1 + dim1(i);
+    start2 = 1;
+    end2 = 0;
+    for j=1:length(dim1)
+        end2 = end2 + dim1(j);
+        gradNum(i,j) = 0.5*(sum(sum(K1(start1:end1, start2:end2) - K2(start1:end1, start2:end2))))/epsilon;
+        start2 = end2 + 1;
+    end
+    start1 = end1 + 1;
+end
 %%%% SPRING 1
 spring = sdlfmKern1.spring;
 sdlfmKern1.spring = spring + epsilon;
@@ -120,8 +145,22 @@ K2 = fhandle1(sdlfmKern1, sdlfmKern2, t1, t2, covIC);
 sp1n = 0.5*sum(sum((K1 - K2)))/epsilon;
 sdlfmKern1.switchingTimes(indexSP) = spTimes;
 sdlfmKern2.switchingTimes(indexSP) = spTimes;
+%%%%% PARAMETERS SYSTEM 2
+%%%%% MASS 2
+epsilon = 1e-6;
+mass = sdlfmKern2.mass;
+sdlfmKern2.mass = mass + epsilon;
+K1 = fhandle1(sdlfmKern1, sdlfmKern2, t1, t2, covIC);
+sdlfmKern2.mass = mass - epsilon;
+K2 = fhandle1(sdlfmKern1, sdlfmKern2, t1, t2, covIC);
+mass2n = 0.5*sum(sum((K1 - K2)))/epsilon;
+sdlfmKern2.mass = mass;
 %%%%%%%%%%% Helps to see where is a mistake
-% dim1= [20 10 13 7];
+% dim1 = zeros(1, options.nIntervals);
+% for i =1:options.nIntervals
+%     newt1 = t1(t1> spVector(i) & t1<spVector(i+1));
+%     dim1(i) = length(newt1);
+% end
 % gradNum = zeros(length(dim1));
 % start1 = 1;
 % end1 =0;
@@ -136,17 +175,6 @@ sdlfmKern2.switchingTimes(indexSP) = spTimes;
 %     end
 %     start1 = end1 + 1;
 % end
-
-%%%%% PARAMETERS SYSTEM 2
-%%%%% MASS 2
-epsilon = 1e-6;
-mass = sdlfmKern2.mass;
-sdlfmKern2.mass = mass + epsilon;
-K1 = fhandle1(sdlfmKern1, sdlfmKern2, t1, t2, covIC);
-sdlfmKern2.mass = mass - epsilon;
-K2 = fhandle1(sdlfmKern1, sdlfmKern2, t1, t2, covIC);
-mass2n = 0.5*sum(sum((K1 - K2)))/epsilon;
-sdlfmKern2.mass = mass;
 %%%% SPRING 2
 spring = sdlfmKern2.spring;
 sdlfmKern2.spring = spring + epsilon;
@@ -174,7 +202,7 @@ sens2n = 0.5*(sum(sum(K1 - K2)))/epsilon;
 sdlfmKern2.sensitivity(indexS) =  senS;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%[g1, g2, covGradLocal] = fhandle2(sdlfmKern1, sdlfmKern2, t1, t1, covGrad, covIC);
+[g1, g2, covGradLocal] = fhandle2(sdlfmKern1, sdlfmKern2, t1, t2, covGrad, covIC);
 
 indexi = 2;
 indexj = 2;
