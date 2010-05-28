@@ -12,28 +12,29 @@ randn('state', 1967688546)
 rand('twister', 1967688546)
 
 % Create sdlfmKern1
-nIntervals = 4;
+nIntervals = 2;
 tInit = 0;
-tFinal = 5;
-nPoints = 50;
+tFinal = 20;
+nPoints = 200;
 
 t1 = linspace(tInit,tFinal, nPoints)';
 
 
 options.nIntervals = nIntervals;
-options.switchingTimes = [-0.1  1 0.5 1];
-options.nlfPerInt = 2;
+options.switchingTimes = [-2  10];
+options.nlfPerInt = 1;
+options.isNormalised = true;
 
 sdlfmKern1 = kernCreate(t1, {'parametric', options ,'sdlfm'});
 [params, names] = kernExtractParam(sdlfmKern1);
 inverseWidth = 2*rand(options.nlfPerInt, options.nIntervals);
 sensitivity = 0.5 + rand(options.nlfPerInt, options.nIntervals);
-sdlfmKern1.inverseWidth = inverseWidth;
+sdlfmKern1.inverseWidth = [1e-3 1];
 sdlfmKern1.sensitivity = sensitivity;
-sdlfmKern1.mass = 1;
-sdlfmKern1.damper = 4;
-sdlfmKern1.spring = 1.5;
-
+sdlfmKern1.mass = 0.1;
+sdlfmKern1.damper = 0.4;
+sdlfmKern1.spring = 2;
+sdlfmKern1.sensitivity = [1 5];
 % Create sdlfmKern2
 
 sdlfmKern2 = kernCreate(t1, {'parametric', options ,'sdlfm'});
@@ -46,7 +47,7 @@ sdlfmKern2 = kernExpandParam(sdlfmKern2, params);
 % Create sdrbfKern
 
 sdrbfKern = kernCreate(t1, {'parametric', options, 'sdrbf'});
-sdrbfKern.inverseWidth = inverseWidth;
+sdrbfKern.inverseWidth = sdlfmKern1.inverseWidth;
 
 K = sdlfmXsdrbfKernCompute(sdlfmKern1, sdrbfKern, t1, t1);
 
@@ -72,7 +73,12 @@ for iq=1:options.nlfPerInt
 end
 iq = 1;
 %%%%%%%%%%%%%%%%%%%%%
-dim1= [10 10 20 10];
+dim1 = zeros(1, options.nIntervals);
+spVector = [cumsum(sdlfmKern1.switchingTimes) t1(end)+50];
+for i =1:options.nIntervals
+    newt1 = t1(t1> spVector(i) & t1<spVector(i+1));
+    dim1(i) = length(newt1);
+end
 gradNum = zeros(length(dim1));
 start1 = 1;
 end1 =0;
@@ -115,7 +121,7 @@ end
 sdlfmKern1.damper = damper;
 %%%% INVERSE WIDTH 1
 iq = 1;
-indexIW = 2;
+indexIW = 1;
 invW = sdlfmKern1.inverseWidth(indexIW);
 sdlfmKern1.inverseWidth(indexIW) = invW + epsilon;
 sdrbfKern.inverseWidth(indexIW) = invW + epsilon;
@@ -153,7 +159,7 @@ sdrbfKern.switchingTimes(indexSP) = spTimes;
 
 
 [g1, g2] = fhandle2(sdlfmKern1, sdrbfKern, t1, t1, covGrad);
-
+stop = 1;
 
 
 

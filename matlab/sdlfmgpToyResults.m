@@ -61,7 +61,7 @@ for k=1:nFigs,
     minimum = min((mu{k}-2*real(sqrt(varsigma{k})))*scaleVal);
     maximum = max((mu{k}+2*real(sqrt(varsigma{k})))*scaleVal);
     if isfield(model, 'X_u') && ~isempty(model.X_u);
-        b = plot(model.X_u, -2, 'kx');
+        b = plot(model.X_u, -0.5, 'kx');
         set(b, 'linewidth', 2)
         set(b, 'markersize', 10);
     end

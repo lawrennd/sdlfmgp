@@ -49,16 +49,6 @@ switch model.approx
         % to it.
         model.sdrbfKern.inverseWidth = model.kern.comp{1}.comp{1}.inverseWidth;
         model.sdrbfKern.switchingTimes = model.kern.comp{1}.comp{1}.switchingTimes;
-% 
-%         indxIW = paramNameRegularExpressionLookup(model, '.* inverse width .*');
-%         indxSP = paramNameRegularExpressionLookup(model, '.* switching point .*');
-%         indxIW1 = paramNameRegularExpressionLookup(model.sdrbfKern, 'inverse width .*',1); 
-%         indxSP1 = paramNameRegularExpressionLookup(model.sdrbfKern, 'switching point .*',1); 
-%         params = kernExtractParam(model.kern);
-%         params1 = kernExtractParam(model.sdrbfKern); 
-%         params1(indxIW1) = params(indxIW);
-%         params1(indxSP1) = params(indxSP);
-%         model.sdrbfKern = kernExpandParam(model.sdrbfKern, params1);
         mu = cell(model.d+model.nlfPerInt,1);
         varsig = cell(model.d+model.nlfPerInt,1);
         Kfu = zeros(model.N, model.nlfPerInt*length(X{1}));
@@ -151,6 +141,9 @@ switch model.approx
         % Organize Kuu and Kyu
         for r = 1:model.nlfPerInt,
             Ku_star_u{r,1} = KuuTemp{r};
+            if isfield(model, 'gamma') && ~isempty(model.gamma)
+                Ku_star_u{r,1} =  Ku_star_u{r,1} + model.gamma(r)*eye(size(Ku_star_u{r,1}));
+            end
             for i =1:model.nout,
                 KX_star_X2{i,r} = real(KyuTemp{i}{r});
             end

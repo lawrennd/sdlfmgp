@@ -51,11 +51,14 @@ end
 KuuTemp = multiKernComputeBlock(model.kern.comp{1}, model.X{1},1,1);
 
 % Organize Kuu and Kyu
-for r = 1:model.nlfPerInt,                                                                                                                                         
-  model.Kuu{r,1} = KuuTemp{r};
-  for i =1:model.nout,
-      model.Kyu{i,r} = real(KyuTemp{i}{r});
-  end                                                                                                                                                        
-end 
+for r = 1:model.nlfPerInt,
+    model.Kuu{r,1} = KuuTemp{r};
+    if isfield(model, 'gamma') && ~isempty(model.gamma)
+        model.KuuGamma{r,1} = model.Kuu{r,1} + model.gamma(r)*eye(size(model.Kuu{r,1})); 
+    end     
+    for i =1:model.nout,
+        model.Kyu{i,r} = real(KyuTemp{i}{r});
+    end
+end
 
 

@@ -69,6 +69,16 @@ switch model.approx
             [dLdKyy, dLdKuy, dLdKuu, dLdmu] = spmultigpLocalCovGradient(model);
             gBeta = [];
         end
+        if isfield(model, 'gamma') && ~isempty(model.gamma)
+            gGamma = zeros(1, model.nlfPerInt);
+            for i =1:model.nlfPerInt
+                gGamma(i) = trace(dLdKuu{i});                
+            end
+            fhandle = str2func([model.gammaTransform 'Transform']);
+            gGamma = gGamma.*fhandle(model.gamma, 'gradfact');            
+        else            
+            gGamma = [];
+        end
         if ~model.fixInducing
             [gParam, gX_u] =  spsdlfmgpKernGradient(model, dLdKyy, dLdKuy, dLdKuu);
         else
@@ -90,7 +100,7 @@ switch model.approx
         else
             g_meanFunc = [];
         end
-        gParam = [gParam g_scaleBias g_meanFunc gBeta];
+        gParam = [gParam g_scaleBias g_meanFunc gGamma gBeta];
         if isfield(model, 'fix')
             for i = 1:length(model.fix)
                 gParam(model.fix(i).index) = 0;

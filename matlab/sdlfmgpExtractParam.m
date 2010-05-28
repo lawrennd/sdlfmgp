@@ -58,49 +58,27 @@ else
     meanFuncParams =[];
 end
 
-% Check if there is a parameter beta
+if isfield(model, 'gamma') && ~isempty(model.gamma)
+    fhandle = str2func([model.gammaTransform 'Transform']);
+    gammaParams = fhandle(model.gamma, 'xtoa');    
+    if nargout>1
+        gammaParamNames = cell(model.nlf,1);
+        for i = 1:length(gammaParams)
+            gammaParamNames{i} = ['Gamma ' num2str(i)];
+        end
+    end
+else
+    gammaParamNames = {};
+    gammaParams =[];
+end
 
 if isfield(model, 'beta') && ~isempty(model.beta)
-    if isfield(model, 'noiseOpt') && ~isempty(model.noiseOpt)
-        switch model.noiseOpt            
-            case {0,1}
-                if isfield(model, 'betaTransform') && ~isempty(model.betaTransform)
-                    fhandle = str2func([model.betaTransform 'Transform']);
-                    betaParams = fhandle(model.beta, 'xtoa');
-                end
-                if nargout>1
-                    betaParamNames = cell(model.nout,1);
-                    for i = 1:length(betaParams)
-                        betaParamNames{i} = ['Beta ' num2str(i)];
-                    end
-                end
-            case 2
-                if isfield(model, 'betaTransform') && ~isempty(model.betaTransform)
-                    fhandle = str2func([model.betaTransform 'Transform']);
-                    betaParams = fhandle(cell2mat(model.beta)', 'xtoa');
-                end
-                if nargout>1
-                    betaParamNames = cell(model.nout,1);
-                    for i = 1:model.nout,
-                        for j = 1:size(model.beta{i},1)
-                            betaParamNames{i} = ['Beta ' num2str(i) ',' num2str(j)];
-                        end
-                    end
-                end
-            case 3
-                betaParamNames = {};
-                betaParams =[];                
-        end        
-    else
-        if isfield(model, 'betaTransform') && ~isempty(model.betaTransform)
-            fhandle = str2func([model.betaTransform 'Transform']);
-            betaParams = fhandle(model.beta, 'xtoa');
-        end
-        if nargout>1
-            betaParamNames = cell(model.nout,1);
-            for i = 1:length(betaParams)
-                betaParamNames{i} = ['Beta ' num2str(i)];
-            end
+    fhandle = str2func([model.betaTransform 'Transform']);
+    betaParams = fhandle(model.beta, 'xtoa');    
+    if nargout>1
+        betaParamNames = cell(model.nout,1);
+        for i = 1:length(betaParams)
+            betaParamNames{i} = ['Beta ' num2str(i)];
         end
     end
 else
@@ -108,11 +86,13 @@ else
     betaParams =[];
 end
 
+
 % Check if there is a noise model
-paramPart = [kernParams scaleParams meanFuncParams betaParams];
+paramPart = [kernParams scaleParams meanFuncParams gammaParams betaParams];
+
 if nargout > 1
     names = {kernParamNames{:}, meanFuncParamNames{:}, ...
-        scaleParamNames{:}, betaParamNames{:}};
+        scaleParamNames{:}, gammaParamNames{:}, betaParamNames{:}};
 end
 
 if isfield(model, 'fix')

@@ -102,9 +102,11 @@ switch model.approx
                 % Especially useful for 1D case. It allows to move the
                 % pseudo-inputs a further to the original input range
                 for j = 1:q,
-                    factor = 0.1;
+                    factor = 0.05;
                     med = (max(X{1}(:,j)) - min(X{1}(:,j)))/2;
-                    posX(:,j) = linspace(min(X{1}(:,j)) - factor*med, ...
+%                     posX(:,j) = linspace(min(X{1}(:,j)) - factor*med, ...
+%                         max(X{1}(:,j)) + factor*med, numActive)';
+                    posX(:,j) = linspace(options.kern.switchingTimes(1)+0.1, ...
                         max(X{1}(:,j)) + factor*med, numActive)';
                 end
             case 'espacedInRange'
@@ -232,6 +234,17 @@ model.nParams = model.nParams + model.kern.nParams;
 % Creates the noise model (Default model: one beta per output)
 switch model.approx
     case {'dtc','fitc','pitc', 'dtcvar'}
+        % In this structure is easier to put noise in the latent functions
+        % at the top level
+        if isfield(options, 'gamma') && ~isempty(options.gamma)
+            if size(options.gamma,2) == model.nlfPerInt
+                model.gamma = options.gamma;
+            else
+                model.gamma = options.gamma*ones(1,model.nlfPerInt);
+            end
+            model.gammaTransform =  optimiDefaultConstraint('positive');
+            model.nParams = model.nParams + model.nlfPerInt;
+        end
         if isfield(options, 'beta') && ~isempty(options.beta)
             if size(options.beta,2) == model.nout
                 model.beta = options.beta;
@@ -239,51 +252,14 @@ switch model.approx
                 model.beta = options.beta*ones(1,model.nout);
             end
             model.betaTransform =  optimiDefaultConstraint('positive');
-            model.nParams = model.nParams + model.nout;
-            if isfield(options, 'noiseOpt') && ~isempty(options.noiseOpt)
-                model.noiseOpt = options.noiseOpt;
-                switch options.noiseOpt
-                    case 0
-                        % Tie the noise parameters
-                        index = paramNameRegularExpressionLookup(model, 'Beta .*');
-                        tieInd{end+1} = index;
-                    case 1
-                        index = paramNameRegularExpressionLookup(model, 'Beta .*');
-                        tieInd{end+1} = index;
-                        % Looks for nRepeats in options
-                        if isfield(options, 'nRepeats') && ~isempty(options.nRepeats)
-                            model.nRepeats = options.nRepeats;
-                        else
-                            error('Must provide the number of repeats')
-                        end
-                    case 2
-                        % This case assumes a noise value for each entry.
-                        model.nParams = model.nParams - model.nout;
-                        model.beta = cell(model.nout,1);
-                        betaParams = 0;
-                        for k=1:model.nout
-                            betaParams = betaParams + size(model.X{model.nlf+k},1);
-                            model.beta{k} = options.beta(1)*ones(size(model.X{model.nlf+k},1),1);
-                        end
-                        model.nParams = model.nParams + betaParams;
-                    case 3
-                        % This case assumes a value for the variance is
-                        % provided
-                        model.nParams = model.nParams - model.nout;
-                        if isfield(options, 'yvar') && ~isempty(options.yvar)
-                            model.beta = options.yvar;
-                        else
-                            error('For option.noiseOpt=3, values for variances must be provided')
-                        end
-                        model = rmfield(model, 'betaTransform');
-                end
-            end
+            model.nParams = model.nParams + model.nout;      
         end
-        %[model, tieInd] =  noiseModelCreate(model, options, tieInd);
         if ~options.fixInducing
             model.nParams = model.nParams + sum(model.k)*model.q;
         end
 end
+
+
 
 fhandle = [model.kernType 'SdlfmgpFixParam'];
 if exist(fhandle, 'file')

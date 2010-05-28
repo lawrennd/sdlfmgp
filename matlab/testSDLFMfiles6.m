@@ -18,7 +18,8 @@ t1 = linspace(tInit,tFinal, nPoints)';
 
 options.nIntervals = nIntervals;
 options.switchingTimes = [-0.1  1  3];
-options.nlfPerInt = 2;
+options.nlfPerInt = 1;
+options.isNormalised = 1;
 
 inverseWidth = 2*rand(1, options.nlfPerInt*options.nIntervals);
 

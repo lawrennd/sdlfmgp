@@ -46,7 +46,7 @@ for i = 1:model.nout
     gMulti(startVal:endVal) = g1;
     startVal = endVal + 1;
 end
-% Derivatives of the kernel between ouputs
+% % Derivatives of the kernel between ouputs
 if ~isempty(dLdKyy{1})
     startVal = model.kern.comp{1}.comp{1}.nParams + 1;
     endVal = model.kern.comp{1}.comp{1}.nParams;
@@ -112,8 +112,10 @@ if ~isempty(dLdKyy{1})
             Jij(i,j) = 0; Jji(j,i) = 0;
         end
     end
+else
+    gIC = zeros(2*model.kern.comp{1}.numPositions);
 end
-
+%gIC = zeros(2*model.kern.comp{1}.numPositions);
 gKernParam = [gMulti(1:model.kern.comp{1}.nParamsWIC) gIC(:)'];
 
 if nargout>1

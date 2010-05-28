@@ -43,32 +43,20 @@ if isfield(model, 'meanFunction') && ~isempty(model.meanFunction)
         paramPart(startVal:endVal));
 end
 
+% Check if there is a gamma parameter.
+if isfield(model, 'gamma') && ~isempty(model.gamma)
+    startVal = endVal + 1;
+    endVal = endVal + model.nlf;
+    fhandle = str2func([model.gammaTransform 'Transform']);
+    model.gamma = fhandle(paramPart(startVal:endVal), 'atox');
+end
+
 % Check if there is a beta parameter.
 if isfield(model, 'beta') && ~isempty(model.beta)
-    if isfield(model, 'noiseOpt') && ~isempty(model.noiseOpt)
-        switch model.noiseOpt
-            case {0,1}
-                startVal = endVal + 1;
-                endVal = endVal + model.nout;
-                fhandle = str2func([model.betaTransform 'Transform']);
-                model.beta = fhandle(paramPart(startVal:endVal), 'atox');                
-            case 2                
-                startVal = endVal + 1;
-                endVal = endVal + model.N;
-                fhandle = str2func([model.betaTransform 'Transform']);
-                betaParams = fhandle(paramPart(startVal:endVal), 'atox');
-                sizeRows = cellfun('size', model.beta, 1);
-                sizeCols = cellfun('size', model.beta, 2);
-                model.beta = mat2cell(betaParams, sizeRows, sizeCols);
-            case 3
-                % No parameters are expanded.
-        end
-    else
-        startVal = endVal + 1;
-        endVal = endVal + model.nout;
-        fhandle = str2func([model.betaTransform 'Transform']);
-        model.beta = fhandle(paramPart(startVal:endVal), 'atox');
-    end
+    startVal = endVal + 1;
+    endVal = endVal + model.nout;
+    fhandle = str2func([model.betaTransform 'Transform']);
+    model.beta = fhandle(paramPart(startVal:endVal), 'atox');
 end
 
 switch model.approx
