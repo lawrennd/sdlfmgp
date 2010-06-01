@@ -34,37 +34,41 @@ for i = 1:length(kern.comp)
   fprintf('Block %d\n', i)
   kernDisplay(kern.comp{i}, varargin{:});
 end
-% Print positions covariance
-for i = 1:kern.numPositions
-    for j = 1:kern.numPositions
-        fprintf(spacing)
-        fprintf('Covariance at time zero between position %d and position %d: %f\n', ...
-            i,j, kern.KIC(i,j));    
-    end    
+if kern.numBlocks>6
+    fprintf(spacing)
+    fprintf('For more than 5 outputs, the covariance of the initial conditions is not printed.\n');
+else
+    % Print positions covariance
+    for i = 1:kern.numPositions
+        for j = 1:kern.numPositions
+            fprintf(spacing)
+            fprintf('Covariance at time zero between position %d and position %d: %f\n', ...
+                i,j, kern.KIC(i,j));
+        end
+    end
+    % Print velocities against positions covariance
+    for i = kern.numPositions+1:2*kern.numPositions
+        for j = 1:kern.numPositions
+            fprintf(spacing)
+            fprintf('Covariance at time zero between velocity %d and position %d: %f\n', ...
+                i - kern.numPositions, j, kern.KIC(i,j));
+        end
+    end
+    % Print positions against velocities covariance
+    for i = 1:kern.numPositions
+        for j = kern.numPositions+1:2*kern.numPositions
+            fprintf(spacing)
+            fprintf('Covariance at time zero between position %d and velocity %d: %f\n', ...
+                i,j-kern.numPositions, kern.KIC(i,j));
+        end
+    end
+    % Print velocities covariance
+    for i = kern.numPositions+1:2*kern.numPositions
+        for j = kern.numPositions+1:2*kern.numPositions
+            fprintf(spacing)
+            fprintf('Covariance at time zero between velocity %d and velocity %d: %f\n', ...
+                i-kern.numPositions,j-kern.numPositions, kern.KIC(i,j));
+        end
+    end
 end
-% Print velocities against positions covariance
-for i = kern.numPositions+1:2*kern.numPositions
-    for j = 1:kern.numPositions
-        fprintf(spacing)
-        fprintf('Covariance at time zero between velocity %d and position %d: %f\n', ...
-            i - kern.numPositions, j, kern.KIC(i,j));     
-    end    
-end
-% Print positions against velocities covariance
-for i = 1:kern.numPositions
-    for j = kern.numPositions+1:2*kern.numPositions
-        fprintf(spacing)
-        fprintf('Covariance at time zero between position %d and velocity %d: %f\n', ...
-            i,j-kern.numPositions, kern.KIC(i,j));     
-    end    
-end
-% Print velocities covariance
-for i = kern.numPositions+1:2*kern.numPositions
-    for j = kern.numPositions+1:2*kern.numPositions
-        fprintf(spacing)
-        fprintf('Covariance at time zero between velocity %d and velocity %d: %f\n', ...
-            i-kern.numPositions,j-kern.numPositions, kern.KIC(i,j));     
-    end    
-end
-
 

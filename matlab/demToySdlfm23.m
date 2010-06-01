@@ -20,17 +20,17 @@ yTemp = yTemp{indexSample};
 XTemp = XTemp{indexSample};
 
 options = sdlfmgpOptions('dtcvar');
-options.nIntervals = 2;
+options.nIntervals = 3;
 options.nlfPerInt = 1;
 options.nlf = options.nlfPerInt;
 options.kern.nIntervals = options.nIntervals;
-options.kern.switchingTimes = [-1 5];
+options.kern.switchingTimes = [-1 5 8];
 options.kern.nlfPerInt = options.nlfPerInt;
 options.numActive = 20;
 options.includeNoise = false;
 options.beta = 1e-3;
 options.initialInducingPositionMethod = 'espaced';
-
+options.kern.isNormalised = true;
 
 Y = cell(1, length(yTemp));
 X = cell(1, length(yTemp));
@@ -81,12 +81,12 @@ indexDamper = paramNameRegularExpressionLookup(model, '.* damper');
 params(indexDamper) = log([0.4 1]);
 indexSpring = paramNameRegularExpressionLookup(model, '.* spring');
 params(indexSpring) = log([2 3]);
-% indexIW = paramNameRegularExpressionLookup(model, '.* inverse width .*');
-% %params(indexIW) = log(1e-3*rand(1,length(indexIW)));
-% params(indexIW) = log(1e-3);
-% sens = paramNameRegularExpressionLookup(model, '.* sensitivity .*');
+indexIW = paramNameRegularExpressionLookup(model, '.* inverse width .*');
+%params(indexIW) = log(1e-3*rand(1,length(indexIW)));
+params(indexIW) = log(1e-3);
+%sens = paramNameRegularExpressionLookup(model, '.* sensitivity .*');
 % params(sens) = [10 1 10 5 -10 1];
-%params(sens) = 2*rand(1,length(sens));
+%params(sens) = rand(1,length(sens));
 model = modelExpandParam(model, params);
 
 display = 1;
@@ -122,5 +122,5 @@ capName = dataSetName;
 capName(1) = upper(capName(1));
 save(['dem' capName num2str(experimentNo) '.mat'], 'model');
 
-sdlfmgpToyResults(dataSetName, experimentNo, XTemp2{indexSample}, yTemp2{indexSample}, ...
+sdlfmgpToyResults(model, XTemp2{indexSample}, yTemp2{indexSample}, ...
     XTestTemp{indexSample}, yTestTemp{indexSample})

@@ -22,8 +22,8 @@ XTemp = XTemp{indexSample};
 
 
 options = sdlfmgpOptions('dtcvar');
-options.nIntervals = 2;
-options.nlfPerInt = 1;
+options.nIntervals = 1;
+options.nlfPerInt = 2;
 options.nlf = options.nlfPerInt;
 options.kern.nIntervals = options.nIntervals;
 options.kern.switchingTimes = [-2 10];

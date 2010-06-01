@@ -174,7 +174,7 @@ switch model.approx
                 mux_star = zeros(size(X{i},1),1);
                 Kx_starXu = zeros(size(X{i},1));
                 for r =1:model.nlfPerInt,
-                    DinvKyuAinv{r} = zeros(size(model.X{i+1},1),model.k(r));
+                    DinvKyuAinv{r} = zeros(size(model.X{i+1},1),model.k);
                     for q =1:model.nlfPerInt,
                         Kx_starXu = Kx_starXu + KX_star_X2{i,r}*KuuinvAinv{r,q}*KX_star_X2{i,q}';
                         DinvKyuAinv{r} = DinvKyuAinv{r} + model.KuyDinv{q,i}'*model.Ainv{q,r};
@@ -202,37 +202,37 @@ switch model.approx
                 end
                 switch model.kernType
                     case {'gg','ggwhite'}
-                        mu{i+1} = mux_star*model.scale(i) + model.bias(i);
+                        mu{i+model.nlfPerInt} = mux_star*model.scale(i) + model.bias(i);
                     otherwise
                         if isfield(model, 'meanFunction') && ~isempty(model.meanFunction)
-                            mu{i+1} = mux_star*model.scale(i) + m(i) + model.bias(i);
+                            mu{i+model.nlfPerInt} = mux_star*model.scale(i) + m(i) + model.bias(i);
                         else
-                            mu{i+1} = mux_star*model.scale(i) + model.bias(i);
+                            mu{i+model.nlfPerInt} = mux_star*model.scale(i) + model.bias(i);
                         end
                 end
                 if nargout == 2
                     if model.includeInd
                         if isfield(model, 'beta') && ~isempty(model.beta)
-                            varsig{i+1} = (KX_star_Diag{i} - diag(Kx_starXu) - diag(covInd) + 1/model.beta(i))*model.scale(i)*model.scale(i);
+                            varsig{i+model.nlfPerInt} = (KX_star_Diag{i} - diag(Kx_starXu) - diag(covInd) + 1/model.beta(i))*model.scale(i)*model.scale(i);
                         else
-                            varsig{i+1} = (KX_star_Diag{i} - diag(Kx_starXu) - diag(covInd))*model.scale(i)*model.scale(i);
+                            varsig{i+model.nlfPerInt} = (KX_star_Diag{i} - diag(Kx_starXu) - diag(covInd))*model.scale(i)*model.scale(i);
                         end
                     else
                         if isfield(model, 'beta') && ~isempty(model.beta)
                             if isfield(model, 'noiseOpt') && ~isempty(model.noiseOpt)
                                 switch model.noiseOpt
                                     case 0
-                                        varsig{i+1} = (KX_star_Diag{i} - diag(Kx_starXu) + 1/model.beta(i))*model.scale(i)*model.scale(i);
+                                        varsig{i+model.nlfPerInt} = (KX_star_Diag{i} - diag(Kx_starXu) + 1/model.beta(i))*model.scale(i)*model.scale(i);
                                     case 1
                                     case 2
                                     case 3
-                                        varsig{i+1} = (KX_star_Diag{i} - diag(Kx_starXu) )*model.scale(i)*model.scale(i);
+                                        varsig{i+model.nlfPerInt} = (KX_star_Diag{i} - diag(Kx_starXu) )*model.scale(i)*model.scale(i);
                                 end                                
                             else
-                                varsig{i+1} = (KX_star_Diag{i} - diag(Kx_starXu) + 1/model.beta(i))*model.scale(i)*model.scale(i);
+                                varsig{i+model.nlfPerInt} = (KX_star_Diag{i} - diag(Kx_starXu) + 1/model.beta(i))*model.scale(i)*model.scale(i);
                             end
                         else
-                            varsig{i+1} = (KX_star_Diag{i} - diag(Kx_starXu))*model.scale(i)*model.scale(i);
+                            varsig{i+model.nlfPerInt} = (KX_star_Diag{i} - diag(Kx_starXu))*model.scale(i)*model.scale(i);
                         end
                     end
                 end

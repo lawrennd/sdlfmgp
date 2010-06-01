@@ -29,12 +29,12 @@ sdlfmKern1 = kernCreate(t1, {'parametric', options ,'sdlfm'});
 [params, names] = kernExtractParam(sdlfmKern1);
 inverseWidth = 2*rand(options.nlfPerInt, options.nIntervals);
 sensitivity = 0.5 + rand(options.nlfPerInt, options.nIntervals);
-sdlfmKern1.inverseWidth = [1e-3 1];
+% sdlfmKern1.inverseWidth = [1e-3 1];
 sdlfmKern1.sensitivity = sensitivity;
 sdlfmKern1.mass = 0.1;
 sdlfmKern1.damper = 0.4;
 sdlfmKern1.spring = 2;
-sdlfmKern1.sensitivity = [1 5];
+% sdlfmKern1.sensitivity = [1 5];
 % Create sdlfmKern2
 
 sdlfmKern2 = kernCreate(t1, {'parametric', options ,'sdlfm'});
@@ -142,7 +142,7 @@ K2 = fhandle1(sdlfmKern1, sdrbfKern, t1, t1);
 sensn = 0.5*(sum(sum(K1{iq} - K2{iq})))/epsilon;
 sdlfmKern1.sensitivity(indexS) =  senS;
 %%%% SWITCHING TIME
-indexSP = indexIW;
+indexSP = 1;
 spTimes = sdlfmKern1.switchingTimes(indexSP);
 sdlfmKern1.switchingTimes(indexSP) = spTimes + epsilon;
 sdrbfKern.switchingTimes(indexSP) = spTimes + epsilon;

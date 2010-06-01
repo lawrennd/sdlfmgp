@@ -1,9 +1,9 @@
-function sdlfmgpToyResults(dataSetName, experimentNo, XTemp, yTemp, XGT, fGT)
+function sdlfmgpToyResults(model, XTemp, yTemp, XGT, fGT)
 
 % SDLFMGPTOYRESULTS Show the prediction results for the demSdlfmgpToy demo.
 % FORMAT 
 % DESC Show the prediction results for the demGgToy demo.
-% ARG dataSetName : name of the dataset used for the demo
+% ARG model : name of the dataset used for the demo
 % ARG experimentNo : number of the experiment
 % ARG XTemp : input locations training data
 % ARG yTemp : output values for training data
@@ -12,10 +12,14 @@ function sdlfmgpToyResults(dataSetName, experimentNo, XTemp, yTemp, XGT, fGT)
 
 % SDLFMGP
 
+if nargin < 4
+    XGT = [];
+    fGT = [];
+end
 
-capName = dataSetName;
-capName(1) = upper(capName(1));
-load(['dem' capName num2str(experimentNo) '.mat'], 'model');
+% capName = dataSetName;
+% capName(1) = upper(capName(1));
+% load(['dem' capName num2str(experimentNo) '.mat'], 'model');
 
 saveFigures = false;
 scaleVal = 1;
@@ -36,7 +40,7 @@ for i = 1:size(yTemp, 2)
   X{i+model.nlfPerInt} = XTemp{i};
 end
 
-Xt = linspace(min(X{2})-0.5,max(X{2})+0.5,200)';
+Xt = linspace(min(X{model.nlfPerInt+1}),max(X{model.nlfPerInt+1}),200)';
 %Xt = linspace(0.1,10,200)';
 %Xt = [-1.25 1.27];
 [mu, varsigma] = sdlfmgpPosteriorMeanVar(model, Xt);
@@ -56,7 +60,9 @@ for k=1:nFigs,
     a =[ a plot(Xt, mu{k}*scaleVal,'k-')];
     if k>model.nlfPerInt
         c =plot(X{k},y{k}*scaleVal,'k.');
-        d =plot(XGT{k-model.nlfPerInt}, fGT{k-model.nlfPerInt}, 'k--'); 
+        if ~isempty(XGT) && ~isempty(fGT)            
+            d =plot(XGT{k-model.nlfPerInt}, fGT{k-model.nlfPerInt}, 'k--');
+        end
     end
     minimum = min((mu{k}-2*real(sqrt(varsigma{k})))*scaleVal);
     maximum = max((mu{k}+2*real(sqrt(varsigma{k})))*scaleVal);
@@ -68,7 +74,9 @@ for k=1:nFigs,
     if k>model.nlfPerInt
         %ylim = [min(minimum,min(y{k}*scaleVal)) max(maximum,max(y{k}*scaleVal))];
         set(c,   'markersize', 0.7*markersize);
-        set(d,   'lineWidth', linewidth);
+        if ~isempty(XGT) && ~isempty(fGT)            
+            set(d,   'lineWidth', linewidth);
+        end
     else
         %ylim = [min(minimum,min(y{model.nlf+1}*scaleVal)) max(maximum,max(y{model.nlf+1}*scaleVal))];
     end

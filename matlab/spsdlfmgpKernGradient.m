@@ -40,7 +40,7 @@ endVal = model.kern.comp{1}.comp{1}.nParams;
 for i = 1:model.nout
     endVal = endVal + model.kern.comp{1}.comp{i+1}.nParams;
     dLdKuyMat = cell2mat(dLdKuy(:,i));
-    dLdKyu = mat2cell(dLdKuyMat', model.sizeX(i), model.k);
+    dLdKyu = mat2cell(dLdKuyMat', model.sizeX(i), model.k*ones(1, model.nlfPerInt));
     g1 = multiKernGradientBlock(model.kern.comp{1}, model.X{i+1}, ...
         model.X{1}, dLdKyu, i+1, 1);
     gMulti(startVal:endVal) = g1;

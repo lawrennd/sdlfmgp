@@ -18,5 +18,5 @@ switch model.approx
 end
 
 if isfield(model, 'beta') && ~isempty(model.beta)
-    model = spmultigpUpdateAD(model);
+    model = spsdlfmgpUpdateAD(model);
 end

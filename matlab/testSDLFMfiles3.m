@@ -18,7 +18,7 @@ t2 = linspace(tInit,tFinal, nPoints2)';
 options.nIntervals = nIntervals;
 options.switchingTimes = [-0.1 2 1 0.5];
 %options.switchingTimes = [-0.1  2];
-options.nlfPerInt = 1;
+options.nlfPerInt = 2;
 
 LIC = [1 0;0 1];
 covIC = [1 0;0 1];
@@ -57,8 +57,8 @@ sdlfmKern1 = sdlfmKern2;
 covGrad = ones(length(t1), length(t2));
 
 
-fhandle1 = str2func('sdlfmvXsdlfmvKernCompute');
-fhandle2 = str2func('sdlfmvXsdlfmvKernGradient');
+fhandle1 = str2func('sdlfmXsdlfmKernCompute');
+fhandle2 = str2func('sdlfmXsdlfmKernGradient');
 
 K = fhandle1(sdlfmKern1, sdlfmKern2, t1, t2, covIC);
 
@@ -113,7 +113,7 @@ K2 = fhandle1(sdlfmKern1, sdlfmKern2, t1, t2, covIC);
 damper1n = 0.5*sum(sum((K1 - K2)))/epsilon;
 sdlfmKern1.damper = damper;
 %%%% INVERSE WIDTH 1
-indexIW = 1;
+indexIW = 4;
 invW = sdlfmKern1.inverseWidth(indexIW);
 sdlfmKern1.inverseWidth(indexIW) = invW + epsilon;
 sdlfmKern2.inverseWidth(indexIW) = invW + epsilon;

@@ -46,7 +46,7 @@ end
 % Check if there is a gamma parameter.
 if isfield(model, 'gamma') && ~isempty(model.gamma)
     startVal = endVal + 1;
-    endVal = endVal + model.nlf;
+    endVal = endVal + model.nlfPerInt;
     fhandle = str2func([model.gammaTransform 'Transform']);
     model.gamma = fhandle(paramPart(startVal:endVal), 'atox');
 end

@@ -62,7 +62,7 @@ if isfield(model, 'gamma') && ~isempty(model.gamma)
     fhandle = str2func([model.gammaTransform 'Transform']);
     gammaParams = fhandle(model.gamma, 'xtoa');    
     if nargout>1
-        gammaParamNames = cell(model.nlf,1);
+        gammaParamNames = cell(model.nlfPerInt,1);
         for i = 1:length(gammaParams)
             gammaParamNames{i} = ['Gamma ' num2str(i)];
         end

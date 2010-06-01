@@ -22,7 +22,7 @@ function kernType = sdlfmgpKernComposer(type, numOut, approx, options)
 switch type
     case 'sdsim'
         % Not implemented yet
-    case 'sdlfm'
+    case {'sdlfm', 'sdlfmv', 'sdlfma'}
         numPositions = numOut/(1+options.includeVel + options.includeAccel);
         switch approx
             case 'ftc'
@@ -37,7 +37,7 @@ switch type
         end
         for i = 1:numPositions
             cont = cont + 1;
-            kernType{cont} = {'parametric', options.kern, 'sdlfm'};
+            kernType{cont} = {'parametric', options.kern, options.kernType};
         end
         if options.includeVel
             if options.includeVel~=options.kern.includeVel

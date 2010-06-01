@@ -41,7 +41,7 @@ switch model.approx
         startVal = 1;
         endVal = 0;
         for j=1:model.d
-            endVal = endVal + size(model.X{j+model.nlf}, 1);
+            endVal = endVal + size(model.X{j+1}, 1);
             m{j} = model.y(startVal:endVal) - mu(j);
             m{j} = m{j} - model.bias(j);
             if model.scale(j)~=1

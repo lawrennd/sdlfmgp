@@ -12,13 +12,19 @@ function tieInd = sdlfmSdlfmgpTieParam(model, options)
 
 % SDLFMGP
 
+% tieInd = cell(model.nIntervals+1,1);
+% cont = 0;
+% indx = paramNameRegularExpressionLookup(model, 'inverse width interval .*');
+% cont = cont + 1;
+% tieInd{cont} = indx;
+
 tieInd = cell(model.nIntervals*(model.nlfPerInt+1),1);
 % Tie the parameters for the inverse widths
 cont = 0;
 for i=1:model.nIntervals
     if model.nlfPerInt == 1
         indx = paramNameRegularExpressionLookup(model, ...
-            ['inverse width interval ' num2str(i) '\.']); 
+            ['inverse width interval ' num2str(i) '\.']);
         cont = cont + 1;
         tieInd{cont} = indx;
     else

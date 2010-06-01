@@ -18,7 +18,7 @@ switch model.approx
         dim = size(model.m, 1);
         ll = -dim*log(2*pi) - model.logDetK - model.m'*model.invK*model.m;
         ll = ll*0.5;
-    case {'dtc','fitc','pitc','dtcvar'}
-        ll = spmultigpLogLikelihood( model);
+    case {'dtc','fitc','pitc','dtcvar'}        
+        ll = spsdlfmgpLogLikelihood( model);
 end
     

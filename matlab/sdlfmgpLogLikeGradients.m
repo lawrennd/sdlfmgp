@@ -52,7 +52,7 @@ switch model.approx
     case {'dtc', 'fitc', 'pitc', 'dtcvar'}
         % Sparse approximations.
         if isfield(model, 'beta') && ~isempty(model.beta)
-            [dLdKyy, dLdKuy, dLdKuu, dLdmu, gBeta] = spmultigpLocalCovGradient(model);
+            [dLdKyy, dLdKuy, dLdKuu, dLdmu, gBeta] = spsdlfmgpLocalCovGradient(model);
             %[dLdKyy, dLdKuy, dLdKuu, dLdmu, gBeta] = spmultigpLocalCovGradient2(model);
             if isfield(model, 'noiseOpt') && ~isempty(model.noiseOpt)
                 if model.noiseOpt == 3
@@ -66,7 +66,7 @@ switch model.approx
                 gBeta = gBeta.*fhandle(model.beta, 'gradfact');
             end
         else                     
-            [dLdKyy, dLdKuy, dLdKuu, dLdmu] = spmultigpLocalCovGradient(model);
+            [dLdKyy, dLdKuy, dLdKuu, dLdmu] = spsdlfmgpLocalCovGradient(model);
             gBeta = [];
         end
         if isfield(model, 'gamma') && ~isempty(model.gamma)

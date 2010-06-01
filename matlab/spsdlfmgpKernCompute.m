@@ -40,6 +40,7 @@ for i =1:model.nout,
     switch model.approx
         case {'dtc','fitc', 'dtcvar'}
             model.Kyy{i,1} = sdkernDiagCompute(model.kern.comp{1}.comp{i+1}, model.X{i+1}, covIC);
+            model.Kyy{i,1} = full(model.Kyy{i,1});
         case 'pitc'
             model.Kyy{i,1} = real(sdmultiKernComputeBlock(model.kern.comp{1}, model.X{i+1}, i+1, i+1, covIC));
     end

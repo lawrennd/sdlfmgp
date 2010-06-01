@@ -58,7 +58,6 @@ model.kernType = options.kernType;
 
 % Number of latent functions
 model.nlfPerInt = options.nlfPerInt;
-model.nlf = model.nlfPerInt;
 
 % Number of intervals
 model.nIntervals = options.nIntervals;
@@ -148,7 +147,7 @@ switch model.approx
         model.y = [];
         for i = 1:length(y)
             model.y = [model.y; y{i}];
-            model.X{i + options.nlfPerInt,1} = X{i};
+            model.X{i + 1,1} = X{i};
             model.sizeX(i) = size(X{i},1);
         end
         model.N = size(model.y,1);
@@ -203,7 +202,7 @@ model.scaleTransform = optimiDefaultConstraint('positive');
 
 switch model.approx
     case {'dtc','fitc','pitc', 'dtcvar'}
-        model = spmultigpCreate( model, options);
+        model = spsdlfmgpCreate( model, options);
 end
 
 model.nParams = 0;

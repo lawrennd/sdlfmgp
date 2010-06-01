@@ -18,10 +18,12 @@ t1 = linspace(tInit,tFinal, nPoints)';
 
 options.nIntervals = nIntervals;
 options.switchingTimes = [-0.1  1  3];
-options.nlfPerInt = 1;
+options.nlfPerInt = 2;
 options.isNormalised = 1;
 
-inverseWidth = 2*rand(1, options.nlfPerInt*options.nIntervals);
+%inverseWidth = 2*rand(1, options.nlfPerInt*options.nIntervals);
+
+inverseWidth = ones(1, options.nlfPerInt*options.nIntervals);
 
 
 % Create sdrbfKern
@@ -39,13 +41,14 @@ K = sdrbfKernCompute(sdrbfKern, t1, t1);
 %%%%% Test the gradients 
 %%% INVERSE WIDTHS
 epsilon = 1e-6;
-indexIW = 1;
+iq = 2;
+indexIW = 4;
 invW = sdrbfKern.inverseWidth(indexIW);
 sdrbfKern.inverseWidth(indexIW) = invW + epsilon;
 K1 = sdrbfKernCompute(sdrbfKern, t1, t1);
 sdrbfKern.inverseWidth(indexIW) = invW - epsilon;
 K2 = sdrbfKernCompute(sdrbfKern, t1, t1);
-inv1n = 0.5*sum(sum(K1{1} -K2{1}))/epsilon;
+inv1n = 0.5*sum(sum(K1{iq} -K2{iq}))/epsilon;
 sdrbfKern.inverseWidth(indexIW) = invW;
 %%% SWITCHING POINTS
 indexSP = 3;
