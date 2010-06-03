@@ -21,8 +21,10 @@ end
 % capName(1) = upper(capName(1));
 % load(['dem' capName num2str(experimentNo) '.mat'], 'model');
 
-saveFigures = false;
+saveFigures = true;
 scaleVal = 1;
+
+spVector = cumsum(model.kern.comp{1}.comp{1}.switchingTimes);
 
 fontsize = 25;
 linewidth = 3;
@@ -91,6 +93,11 @@ for k=1:nFigs,
 %    poslabel(1) = 0;
 %    poslabel(2) = -14;
 %    xlabel('Input', 'fontsize',fontsize, 'position', poslabel);
+    prop = get(gca);
+    for n=1:length(spVector)-1
+        g = plot([spVector(n+1) spVector(n+1)],prop.YLim, 'k--');        
+    end
+    set(g,  'lineWidth', 1.5);
     set(a,   'lineWidth', 2);
     set(gca, 'fontname', 'arial', 'fontsize', fontsize, 'xlim', xlim, 'ylim', ylim, 'Color', 'none')
     %set(gca, 'position', [0.06 0.08 0.9 0.9])
@@ -99,9 +106,9 @@ for k=1:nFigs,
 %    set(gcf, 'PaperPositionMode', 'auto');
     box on
     if saveFigures
-        fileName = ['toy1D' upper(model.approx) num2str(k-model.nlf)];
-        print('-dpdf', ['./resultsToy1D/' fileName]);
-        print('-depsc', ['./resultsToy1D/' fileName], '-loose');
-        print('-dpng', ['./resultsToy1D/' fileName]);
+        fileName = ['sdlfmgpToy2' upper(model.approx) num2str(k-model.nlfPerInt)];
+        print('-dpdf', ['./toy1Results/' fileName]);
+        print('-depsc', ['./toy1Results/' fileName], '-loose');
+        print('-dpng', ['./toy1Results/' fileName]);
     end
 end

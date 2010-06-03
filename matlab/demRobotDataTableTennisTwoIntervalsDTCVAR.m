@@ -10,15 +10,16 @@ randn('seed', 1e6);
 
 addToolboxes(0,1)
 % load data
-P =8;
-lengthSignal = 21;
-load(['./robotData/robotDataP' num2str(P) 'Length' num2str(lengthSignal) '.mat'], 'X', 'y');
-
+P = 8;
+display = 1;
+iters = 200;
+tryNumber = 4;      
+load(['./robotData/robotDataP' num2str(P) 'Try' num2str(tryNumber)  '.mat'], 'X', 'y');    
 options = sdlfmgpOptions('dtcvar');
 options.nIntervals = 2;
 options.nlfPerInt = 1;
 options.kern.nIntervals = options.nIntervals;
-options.kern.switchingTimes = [-4 24];
+options.kern.switchingTimes = [-1 6];
 options.kern.nlfPerInt = options.nlfPerInt;
 options.kern.isNormalised = false;
 if ~strcmp(options.approx,'ftc')
@@ -83,8 +84,5 @@ sens = paramNameRegularExpressionLookup(model, '.* sensitivity .*');
 params(sens) = 0.1*randn(1, length(sens));
 model = modelExpandParam(model, params);
 
-
-display = 1;
-iters = 1000;
 model = modelOptimise(model, [], [], display, iters);
-save('demRobotTwoIntervalDTCVAR.mat', 'model');
+save(['demRobot' num2str(options.nIntervals) 'IntervalDTCVAR'  num2str(tryNumber) '.mat'], 'model');
